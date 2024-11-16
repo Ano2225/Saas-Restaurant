@@ -212,8 +212,6 @@ export default function TransactionPage() {
            </div>
          </div>
        </div>
- 
-       {/* Modal reste inchangée */}
      </div>
     </>
    );

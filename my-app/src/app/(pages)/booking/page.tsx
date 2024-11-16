@@ -51,23 +51,23 @@ export default function BookingPage() {
     <>
     <Header/>
     <div className="body_wrapper mt-20">
-      <div className="page_title bg-white p-6 border-l-4 border-[#fbaf03]">
-        <div className="flex flex-wrap items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-[#4D4D4D] text-2xl font-semibold">
+      <div className="page_title bg-white p-4 sm:p-6 border-l-4 border-[#fbaf03]">
+        <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:items-center sm:justify-between">
+          <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-4 sm:items-center">
+            <h1 className="text-[#4D4D4D] text-xl sm:text-2xl font-semibold">
               Réservations
             </h1>
             <button 
               onClick={() => setShowModal(true)}
-              className="bg-[#fbaf03] text-white px-8 h-12 rounded-full hover:bg-[#fbaf03]/90 transition-colors"
+              className="bg-[#fbaf03] text-white px-6 py-2 sm:px-8 sm:py-3 rounded-full hover:bg-[#fbaf03]/90 transition-colors"
             >
               Faire une reservation
             </button>
           </div>
 
-          {/* Search Bar */}
-          <div className="mt-4 lg:mt-0 w-full lg:w-auto">
-            <div className="relative max-w-md ml-auto">
+          {/* Barre de recherche */}
+          <div className="w-full sm:w-auto">
+            <div className="relative max-w-full sm:max-w-md">
               <div className="absolute inset-y-0 left-4 flex items-center">
                 <Search className="text-gray-400 w-5 h-5" />
               </div>
@@ -85,16 +85,16 @@ export default function BookingPage() {
       </div>
 
       {/* Table des réservations */}
-      <div className="right_sidebar p-6">
+      <div className="right_sidebar p-4 overflow-x-auto">
         <div className="bg-white rounded-lg overflow-hidden">
           {/* Table Header */}
-          <div className="grid grid-cols-6 bg-[#F4F5F8] p-4 border-b border-[#fbaf03]">
-            <div className="text-[#898c97] text-sm font-medium uppercase">Date</div>
-            <div className="text-[#898c97] text-sm font-medium uppercase">Heure</div>
-            <div className="text-[#898c97] text-sm font-medium uppercase">Client</div>
-            <div className="text-[#898c97] text-sm font-medium uppercase">Note</div>
-            <div className="text-[#898c97] text-sm font-medium uppercase">Mise à jour</div>
-            <div className="text-[#898c97] text-sm font-medium uppercase text-right">Actions</div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 bg-[#F4F5F8] p-4 border-b border-[#fbaf03] text-[#898c97] text-sm uppercase font-medium">
+            <div>Date</div>
+            <div className="hidden sm:block">Heure</div>
+            <div>Client</div>
+            <div className="hidden lg:block">Note</div>
+            <div className="hidden lg:block">Mise à jour</div>
+            <div className="text-right">Actions</div>
           </div>
 
 
@@ -103,14 +103,14 @@ export default function BookingPage() {
         {bookings.map((booking, index) => (
             <div 
             key={index} 
-            className="grid grid-cols-6 p-4 hover:bg-gray-50 animate-fadeIn"
+            className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 p-4 hover:bg-gray-50 animate-fadeIn"
             style={{ animationDelay: `${index * 0.1}s` }}
             >
             <div className="text-[#4D4D4D]">{booking.date}</div>
-            <div className="text-[#4D4D4D] font-medium">{booking.time}</div>
+            <div className="hidden sm:block text-[#4D4D4D] font-medium">{booking.time}</div>
             <div className="text-[#4D4D4D] font-medium">{booking.customerName}</div>
-            <div className="text-[#4D4D4D]">{booking.note}</div>
-            <div className="text-[#4D4D4D]">{booking.updatedOn}</div>
+            <div className="hidden lg:block text-[#4D4D4D]">{booking.note}</div>
+            <div className="hidden lg:block text-[#4D4D4D]">{booking.updatedOn}</div>
             <div className="flex justify-end space-x-2">
                 <button 
                 onClick={() => ('')}
@@ -131,11 +131,11 @@ export default function BookingPage() {
 
           {/* Pagination */}
           <div className="p-4 border-t bg-white">
-            <div className="flex flex-wrap items-center justify-between">
+            <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:justify-between sm:items-center">
               <span className="text-[#4D4D4D] text-sm">
                 Affichage 1-10 sur 126 réservations
               </span>
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center justify-center space-x-1">
                 <button className="p-2 rounded hover:bg-gray-100 disabled:opacity-50">
                   <ChevronLeft className="w-5 h-5" />
                 </button>
@@ -160,12 +160,12 @@ export default function BookingPage() {
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg w-full max-w-lg mx-4">
-            <div className="p-6 border-b">
-              <h2 className="text-xl font-semibold text-[#4D4D4D]">Ajouter une réservation</h2>
+            <div className="p-4 sm:p-6 border-b">
+              <h2 className="text-lg sm:text-xl font-semibold text-[#4D4D4D]">Ajouter une réservation</h2>
             </div>
 
-            <div className="p-6 space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="p-4 sm:p-6 space-y-6">
+              <div className="grid grid-cols-1 gap-6">
                 <div>
                   <label className="text-sm text-[#898c97] font-medium uppercase">
                     Date et Heure
@@ -192,7 +192,7 @@ export default function BookingPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 <div>
                   <label className="text-sm text-[#898c97] font-medium uppercase">
                     Nom du client
@@ -230,7 +230,7 @@ export default function BookingPage() {
               </div>
             </div>
 
-            <div className="p-6 border-t bg-gray-50 flex space-x-3">
+            <div className="p-4 sm:p-6 border-t bg-gray-50 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
               <button 
                 onClick={() => setShowModal(false)}
                 className="flex-1 px-6 py-2 bg-gray-200 text-gray-800 rounded-full 

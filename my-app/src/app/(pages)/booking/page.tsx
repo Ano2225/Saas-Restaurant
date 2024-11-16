@@ -50,7 +50,7 @@ export default function BookingPage() {
   return (
     <>
     <Header/>
-    <div className="body_wrapper">
+    <div className="body_wrapper mt-20">
       <div className="page_title bg-white p-6 border-l-4 border-[#fbaf03]">
         <div className="flex flex-wrap items-center justify-between">
           <div className="flex items-center space-x-4">

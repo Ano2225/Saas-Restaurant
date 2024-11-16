@@ -31,7 +31,7 @@ export default function Header() {
   const pathname = usePathname();
 
   const navItems: NavItem[] = [
-    { href: '/', label: 'PDV', icon: <ListTodo className="w-6 h-6" /> },
+    { href: '/home', label: 'PDV', icon: <ListTodo className="w-6 h-6" /> },
     { href: '/transactions', label: 'Transactions', icon: <FileText className="w-6 h-6" /> },
     { href: '/booking', label: 'Réservations', icon: <Calendar className="w-6 h-6" /> },
     { href: '/statut-commandes', label: 'Statut Commandes', icon: <Clock className="w-6 h-6" /> },

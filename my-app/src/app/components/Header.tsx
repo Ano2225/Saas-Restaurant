@@ -50,7 +50,7 @@ export default function Header() {
 
   const isActiveLink = (href: string) => {
     if (href === '/home' && pathname === '/home') return true;
-    if (href !== '/home' && pathname.startsWith(href)) return true;
+    if (href !== '/home' && pathname?.startsWith(href)) return true;
     return false;
   };
 

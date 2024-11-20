@@ -5,7 +5,7 @@ import Head from 'next/head';
 import Header from '@/app/components/Header';
 import OrderSection from '@/app/components/OrderSection';
 import MenuSection from '@/app/components/MenuSection';
-import {MenuItem} from '@/app/types/types'
+import {MenuItem} from '@/app/types/menuTypes'
 
 export interface CartItem extends MenuItem {
     quantity: number;

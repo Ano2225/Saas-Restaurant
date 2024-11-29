@@ -29,7 +29,7 @@ const LoginForm = () => {
         return
       }
       
-      router.push('/dashboard')
+      router.push('/home')
       router.refresh()  
     } catch (error) {
       setError('Une erreur est survenue')
@@ -72,7 +72,7 @@ const LoginForm = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full px-5 py-4 rounded-xl border-2 border-gray-100
+                  className="w-full px-5 py-4 rounded-xl border-2 border-gray-200
                     focus:outline-none focus:border-[#fbaf03]
                     transition-colors duration-200
                     placeholder:text-gray-400 text-[#4D4D4D]
@@ -94,7 +94,7 @@ const LoginForm = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-5 py-4 rounded-xl border-2 border-gray-100
+                  className="w-full px-5 py-4 rounded-xl border-2 border-gray-200
                     focus:outline-none focus:border-[#fbaf03]
                     transition-colors duration-200
                     placeholder:text-gray-400 text-[#4D4D4D]

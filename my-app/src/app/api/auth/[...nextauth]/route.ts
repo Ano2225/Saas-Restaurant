@@ -27,11 +27,19 @@ export const authOptions: NextAuthOptions = {
           if (!user || !await bcrypt.compare(credentials.password, user.password)) {
             return null
           }
-
-          return {
+          const result = {
             id: user.id,
-            name: user.name
+            name: user.name,
+            enterprise_name: user.enterprise_name,
+            role: user.user_Role
           }
+          console.log("User ID:", result.id)
+          console.log("User Name:", result.name)
+          console.log("Enterprise Name:", result.enterprise_name) 
+          return result
+
+       
+
         } catch (error) {
           console.error("Auth error:", error)
           return null
@@ -42,15 +50,27 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
+        token.id = user.id
         token.name = user.name
+        token.enterprise_name = user.enterprise_name
+        token.role = user.role
+
       }
-      return token
+        // Log le token final
+    console.log("JWT callback - Final token:", token)
+    return token
     },
     async session({ session, token }) {
       if (session.user) {
+        session.user.id = token.id as string
         session.user.name = token.name as string
+        session.user.enterprise_name = token.enterprise_name as string
+        session.user.role = token.role as string
+
       }
-      return session
+        // Log la session finale
+    console.log("Session callback - Final session:", session)
+    return session
     }
   },
   pages: {

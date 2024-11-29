@@ -93,6 +93,7 @@ export async function POST(req: Request) {
           user_Role: true
         }
       })
+      console.log('Coompte crée ', data)
 
       return new Response(
         JSON.stringify({

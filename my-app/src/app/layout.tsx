@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Providers from "./providers";
 
 
 
@@ -31,7 +32,9 @@ export default function RootLayout({
       id="page_sign_in" 
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+       <Providers>
+          {children}
+       </Providers>
       </body>
     </html>
   );

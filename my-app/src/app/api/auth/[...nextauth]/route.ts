@@ -30,6 +30,7 @@ export const authOptions: NextAuthOptions = {
           const result = {
             id: user.id,
             name: user.name,
+            email : user.email,
             enterprise_name: user.enterprise_name,
             role: user.user_Role
           }
@@ -38,8 +39,7 @@ export const authOptions: NextAuthOptions = {
           console.log("Enterprise Name:", result.enterprise_name) 
           return result
 
-       
-
+      
         } catch (error) {
           console.error("Auth error:", error)
           return null
@@ -52,6 +52,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.name = user.name
+        token.email = user.email
         token.enterprise_name = user.enterprise_name
         token.role = user.role
 
@@ -64,11 +65,11 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string
         session.user.name = token.name as string
+        session.user.email = token.email as string
         session.user.enterprise_name = token.enterprise_name as string
         session.user.role = token.role as string
 
       }
-        // Log la session finale
     console.log("Session callback - Final session:", session)
     return session
     }

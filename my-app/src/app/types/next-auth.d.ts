@@ -28,3 +28,11 @@ declare module "next-auth/jwt" {
     role: string
   }
 }
+
+
+export interface AuthUser {
+  id: string
+  email: string
+  role: UserRole
+  permissions?: string[]
+}

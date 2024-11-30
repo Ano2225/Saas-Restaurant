@@ -6,6 +6,8 @@ import Header from '@/app/components/Header';
 import OrderSection from '@/app/components/OrderSection';
 import MenuSection from '@/app/components/MenuSection';
 import {MenuItem} from '@/app/types/menuTypes'
+import { useAuth } from '@/app/hooks/useAuth';
+import { ProtectedComponent } from '@/app/components/ProtectedComponent';
 
 export interface CartItem extends MenuItem {
     quantity: number;
@@ -52,8 +54,11 @@ export default function Home({}: HomeProps) {
     setCartItems(items);
   };
 
+
+
   return (
     <>
+    <ProtectedComponent requiredRole='RESTAURANT_OWNER'>
       <Head>
         <title>POS Restaurant - Système de Commande</title>
         <meta name="description" content="Système de point de vente pour restaurant" />
@@ -124,6 +129,7 @@ export default function Home({}: HomeProps) {
           }}
         />
       </div>
+      </ProtectedComponent>
     </>
   );
 }

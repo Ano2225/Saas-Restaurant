@@ -1,10 +1,12 @@
+'use client'
+import { ProtectedComponent } from '@/app/components/ProtectedComponent'
 import React from 'react'
 
 const page = () => {
   return (
-    <div>
-      dashboard admin
-    </div>
+    <ProtectedComponent requiredRole='ADMIN'>
+     <h1> DASHBOARD ADMIN</h1>
+    </ProtectedComponent>
   )
 }
 

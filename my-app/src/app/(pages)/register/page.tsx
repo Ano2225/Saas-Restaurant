@@ -24,19 +24,21 @@ export default function RegisterPage() {
    setLoading(true)
 
    try {
-     const response = await fetch('/api/auth/register', {
-       method: 'POST',
-       headers: {
-         'Content-Type': 'application/json'
-       },
-       body: JSON.stringify(formData)
-     })
-
-     const data = await response.json()
-
-     if (!response.ok) {
-       throw new Error(data.error || 'Une erreur est survenue')
-     }
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      toast.success('Compte créé avec succès !');
+      setTimeout(() => router.push('/login'), 2000);
+    } else {
+      const errorText = await response.text(); 
+      toast.error(errorText || 'Une erreur est survenue');
+    }
+    
 
      toast.success('Compte créé avec succès ! Redirection vers la page de connexion')
      

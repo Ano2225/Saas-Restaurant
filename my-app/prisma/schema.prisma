@@ -19,7 +19,6 @@ model User {
   name              String    @unique
   enterprise_name   String    @unique
   email             String    @unique
-  image             String 
   password          String
   telephone         String    @unique
   user_Role         String    @default("RESTAURANT_OWNER")

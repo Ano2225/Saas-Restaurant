@@ -1,12 +1,12 @@
 import prisma from "@/app/lib/prisma"
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 
 interface Params {
   id: string;
 }
 
-export async function PUT(request: Request, { params }: { params: Params }) {
+export async function PUT(request: NextRequest, { params }: { params: Params }) {
   try {
     const data = await request.json();
     const product = await prisma.product.update({
@@ -30,7 +30,7 @@ export async function PUT(request: Request, { params }: { params: Params }) {
   }
 }
   
-  export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+  export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
     try {
       // Vérifier si le produit a des mouvements de stock
       const movements = await prisma.stockMovement.findMany({

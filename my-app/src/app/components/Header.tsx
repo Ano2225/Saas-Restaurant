@@ -141,7 +141,7 @@ export default function Header() {
      </div>
 
      {/* Spacer pour compenser la hauteur fixe */}
-     <div className="h-[120px]"></div>
+     <div className="h-[100px]"></div>
 
       {/* Side Menu */}
   {isMenuOpen && (

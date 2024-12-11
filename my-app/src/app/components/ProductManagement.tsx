@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash, ChevronLeft, ChevronRight, FolderPlus, X, Save } from 'lucide-react';
 import { ProductForm } from './ProductForm';
 import { CategoryForm } from './Category';
+import { DeleteModal } from './deleteProductModal';
 
 interface Category {
   id: number;
@@ -44,6 +45,8 @@ interface PaginationData {
 // Composant principal
 const ProductManagement = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<number | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -154,31 +157,33 @@ const ProductManagement = () => {
     }
   };
   
-  // De même pour la suppression
-  const handleDeleteProduct = async (productId: number) => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
-      try {
-        const response = await fetch(`/api/products/${productId}`, {
-          method: 'DELETE',
-        });
-        if (response.ok) {
-          // Mettre à jour l'état local
-          setProducts(prevProducts => 
-            prevProducts.filter(product => product.id !== productId)
-          );
-          
-          // Mettre à jour le total dans la pagination
-          setPagination(prev => ({
-            ...prev,
-            total: prev.total - 1
-          }));
-        }
-      } catch (error) {
-        console.error('Erreur lors de la suppression du produit:', error);
-      }
-    }
+  const handleDeleteClick = (productId: number) => {
+    setProductToDelete(productId);
+    setShowDeleteModal(true);
   };
 
+  const handleDeleteConfirm = async () => {
+    if (!productToDelete) return;
+  
+    try {
+      const response = await fetch(`/api/products/${productToDelete}`, {
+        method: 'DELETE',
+      });
+      if (response.ok) {
+        setProducts(prevProducts => 
+          prevProducts.filter(product => product.id !== productToDelete)
+        );
+        setPagination(prev => ({
+          ...prev,
+          total: prev.total - 1
+        }));
+        setShowDeleteModal(false);
+        setProductToDelete(null);
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression du produit:', error);
+    }
+  };
 
  
 
@@ -283,7 +288,7 @@ const ProductManagement = () => {
                 <div className="text-left text-[#4D4D4D] font-semibold">{product.name}</div>
                 <div className="text-left text-[#4D4D4D]">{product.sku}</div>
                 <div className="text-left text-[#4D4D4D]">{product.category.name}</div>
-                <div className="text-right text-[#4D4D4D]">{product.price.toFixed(2)} €</div>
+                <div className="text-right text-[#4D4D4D]">{product.price.toFixed(2)} XOF</div>
                 <div className="text-right">
                 <span className={`${
                     product.stock <= product.minStock ? 'text-red-500' : 'text-green-500'
@@ -302,7 +307,9 @@ const ProductManagement = () => {
                     <Edit className="w-5 h-5 text-[#29B6FF]" />
                 </button>
                 <button 
-                    onClick={() => handleDeleteProduct(product.id)}
+                     onClick={() => handleDeleteClick(product.id)
+
+                     }
                     className="p-2 hover:bg-red-50 rounded-full"
                 >
                     <Trash className="w-5 h-5 text-red-500" />
@@ -330,7 +337,7 @@ const ProductManagement = () => {
             </div>
             <div className="flex justify-between items-center text-sm mb-2">
                 <div className="text-[#4D4D4D]">{product.category.name}</div>
-                <div className="text-[#4D4D4D] font-semibold">{product.price.toFixed(2)} €</div>
+                <div className="text-[#4D4D4D] font-semibold">{product.price.toFixed(2)} XOF</div>
             </div>
             <div className="flex justify-between items-center">
                 <span className={`text-sm ${
@@ -349,10 +356,11 @@ const ProductManagement = () => {
                     <Edit className="w-4 h-4 text-[#29B6FF]" />
                 </button>
                 <button 
-                    onClick={() => handleDeleteProduct(product.id)}
-                    className="p-1.5 hover:bg-red-50 rounded-full"
-                >
-                    <Trash className="w-4 h-4 text-red-500" />
+                    onClick={() => handleDeleteClick(product.id)}
+                    className="p-2 hover:bg-red-50 rounded-full"
+                    title="Supprimer"
+                    >
+                    <Trash className="w-5 h-5 text-red-500" />
                 </button>
                 </div>
             </div>
@@ -413,6 +421,11 @@ const ProductManagement = () => {
           onSave={handleSaveCategory}
         />
       )}
+      {showDeleteModal && (<DeleteModal 
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+      />)}
     </div>
   );
 };

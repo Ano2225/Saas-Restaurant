@@ -37,11 +37,17 @@ export async function GET() {
       (trialEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
     );
 
+    if (user.isTrialExpired || daysLeft <= 0) {
+      return NextResponse.json(
+        { error: "Accès refusé. Période d'essai expirée." },
+        { status: 403 }
+      );
+    }
+
     return NextResponse.json({
       daysLeft: Math.max(0, daysLeft),
       isExpired: user.isTrialExpired
     });
-
   } catch (error) {
     console.error("Erreur lors de la récupération du statut d'essai:", error);
     return NextResponse.json(

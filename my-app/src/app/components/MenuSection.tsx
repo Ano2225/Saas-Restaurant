@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
+import Image from 'next/image';
 
 interface Category {
-  id: string;
+  id: number;
   name: string;
-  icon: string;
   image: string;
+  slug: string;
 }
 
 interface MenuItem {
@@ -15,8 +16,9 @@ interface MenuItem {
   name: string;
   price: number;
   image: string;
-  category: string;
-  isVeg: boolean;
+  categoryId: number;
+  category: Category;
+  description: string;
   quantity?: number;
 }
 
@@ -25,46 +27,62 @@ interface MenuSectionProps {
   setCartItems: any;
 }
 
-const categories: Category[] = [
-  { id: 'fast-food', name: 'Fast Food', icon: '🍔', image: '/images/ic_fastfood.png' },
-  { id: 'seafood', name: 'Fruits de mer', icon: '🦐', image: '/images/ic_Seafood.png' },
-  { id: 'chinese', name: 'Chinois', icon: '🥢', image: '/images/ic_chinese.png' },
-  { id: 'dessert', name: 'Desserts', icon: '🍰', image: '/images/ic_dessert.png' },
-];
-
-const menuItems: MenuItem[] = [
-  {
-    id: 1,
-    name: 'Sandwich Végétarien',
-    price: 5.00,
-    image: '/images/1.png',
-    category: 'fast-food',
-    isVeg: true
-  },
-  {
-    id: 2,
-    name: 'Riz aux Crevettes',
-    price: 8.00,
-    image: '/images/2.png',
-    category: 'seafood',
-    isVeg: false
-  },
-  {
-    id: 3,
-    name: 'Spring Noodle',
-    price: 12.00,
-    image: '/images/7.png',
-    category: 'seafood',
-    isVeg: false
-  },
-];
-
 const MenuSection = ({ cartItems, setCartItems }: MenuSectionProps) => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('fast-food');
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+
+  // Charger les catégories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories');
+        const data = await response.json();
+        setCategories(data);
+        // Sélectionner la première catégorie par défaut
+        if (data.length > 0) {
+          setSelectedCategory(data[0].id.toString());
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des catégories:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Charger les produits selon la catégorie et la recherche
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (selectedCategory) {
+          params.append('categoryId', selectedCategory);
+        }
+        if (searchQuery) {
+          params.append('search', searchQuery);
+        }
+
+        const response = await fetch(`/api/products?${params}`);
+        const data = await response.json();
+        setMenuItems(data.products);
+      } catch (error) {
+        console.error('Erreur lors du chargement des produits:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (selectedCategory) {
+      fetchProducts();
+    }
+  }, [selectedCategory, searchQuery]);
 
   const addToCart = (item: MenuItem) => {
-    setCartItems((prev: any[]) => {
+    setCartItems((prev: MenuItem[]) => {
       const existing = prev.find(i => i.id === item.id);
       if (existing) {
         return prev.map(i => 
@@ -77,12 +95,6 @@ const MenuSection = ({ cartItems, setCartItems }: MenuSectionProps) => {
     });
   };
 
-  const filteredItems = menuItems
-    .filter(item => item.category === selectedCategory)
-    .filter(item => 
-      item.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
   return (
     <div className="mt-4 md:mt-0 w-full">
       <div className="bg-white rounded-lg shadow">
@@ -92,7 +104,7 @@ const MenuSection = ({ cartItems, setCartItems }: MenuSectionProps) => {
             {categories.map((category, index) => (
               <div
                 key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
+                onClick={() => setSelectedCategory(category.id.toString())}
                 className={`
                   animate-zoom-in
                   cursor-pointer
@@ -100,23 +112,24 @@ const MenuSection = ({ cartItems, setCartItems }: MenuSectionProps) => {
                   min-w-[95px] h-[95px]
                   rounded-xl p-2.5
                   transition-all duration-300
-                  ${selectedCategory === category.id 
+                  ${selectedCategory === category.id.toString() 
                     ? 'bg-[#fbaf03]' 
                     : 'bg-white hover:bg-gray-50'}
-                  ${index < 10 ? `animation-delay-${index}00` : ''}
                 `}
                 style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div className="w-[50px] h-[50px] mb-3">
-                  <img 
-                    src={category.image} 
+                  <Image 
+                    src={category.image || '/placeholder.png'} 
                     alt={category.name}
                     className="w-full h-full object-contain"
+                    width={90}
+                    height={90}
                   />
                 </div>
                 <span className={`
                   text-xs font-semibold uppercase tracking-wider
-                  ${selectedCategory === category.id ? 'text-white' : 'text-gray-800'}
+                  ${selectedCategory === category.id.toString() ? 'text-white' : 'text-gray-800'}
                 `}>
                   {category.name}
                 </span>
@@ -154,49 +167,54 @@ const MenuSection = ({ cartItems, setCartItems }: MenuSectionProps) => {
 
       {/* Grille des articles */}
       <div className="mt-4 px-1.5">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-3">
-          {filteredItems.map((item, index) => (
-            <div 
-              key={item.id}
-              onClick={() => addToCart(item)}
-              className={`
-                animate-zoom-in
-                bg-white rounded-xl
-                overflow-hidden
-                cursor-pointer
-                transition-all duration-300
-                hover:shadow-lg
-                ${index < 10 ? `animation-delay-${index}00` : ''}
-              `}
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <div className="relative h-[200px] overflow-hidden">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
-              <div className="p-3">
-                <h2 className="text-[0.89rem] font-semibold text-gray-900 truncate">
-                  {item.name}
-                </h2>
-                <div className="mt-2 flex items-center justify-between">
-                  {item.isVeg && (
-                    <img 
-                      src="/images/ic_veg.png" 
-                      alt="Végétarien" 
-                      className="w-3.5 h-3.5"
-                    />
-                  )}
-                  <span className="text-[0.75rem] font-medium text-gray-900">
-                    {item.price.toFixed(2)} €
-                  </span>
+        {loading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#fbaf03]"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-3">
+            {menuItems.map((item, index) => (
+              <div 
+                key={item.id}
+                onClick={() => addToCart(item)}
+                className={`
+                  animate-zoom-in
+                  bg-white rounded-xl
+                  overflow-hidden
+                  cursor-pointer
+                  transition-all duration-300
+                  hover:shadow-lg
+                `}
+                style={{ animationDelay: `${index * 0.1}s` }}
+              >
+                <div className="relative h-[160px] overflow-hidden">
+                  <Image
+                    src={item.image || '/placeholder.png'}
+                    alt={item.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    fill
+                  />
+                </div>
+                <div className="p-3">
+                  <h2 className="text-[0.89rem] font-semibold text-gray-900 truncate">
+                    {item.name}
+                  </h2>
+                  <div className="mt-2 flex items-center justify-between">
+                    <span className="text-[0.75rem] font-medium text-gray-900">
+                      {item.price.toFixed(2)} XOF
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+        
+        {!loading && menuItems.length === 0 && (
+          <div className="text-center py-12 text-gray-500">
+            Aucun produit trouvé
+          </div>
+        )}
       </div>
     </div>
   );

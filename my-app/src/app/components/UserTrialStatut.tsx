@@ -1,6 +1,7 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation';
 import { FaUser } from 'react-icons/fa';
 import { BiSolidTimeFive } from 'react-icons/bi';
 
@@ -10,6 +11,7 @@ export default function UserTrialStatus() {
    daysLeft: number;
    isExpired: boolean;
  } | null>(null);
+ const router = useRouter();
 
  useEffect(() => {
    const fetchTrialStatus = async () => {
@@ -18,6 +20,10 @@ export default function UserTrialStatus() {
          const response = await fetch('/api/trial-status');
          const data = await response.json();
          setTrialStatus(data);
+
+         if (data.isExpired) {
+           router.push('/subscription');
+         }
        } catch (error) {
          console.error("Erreur lors de la récupération du statut d'essai:", error);
        }
@@ -25,7 +31,7 @@ export default function UserTrialStatus() {
    };
 
    fetchTrialStatus();
- }, [session]);
+ }, [session, router]);
 
  if (!session) return null;
 
@@ -35,20 +41,14 @@ export default function UserTrialStatus() {
        {/* Info Restaurant */}
        <div className="flex items-center gap-2">
          <FaUser className="text-orange-500" />
-         <span className="text-gray-600 font-bold">RESTAURANT :{session.user.enterprise_name} </span>
+         <span className="text-gray-600 font-bold">RESTAURANT : {session.user.enterprise_name}</span>
        </div>
        {/* Statut de l'essai */}
-       {trialStatus && (
-         <div className={`flex items-center gap-2 text-sm ${
-           trialStatus.isExpired ? 'text-red-600' : 'text-orange-600'
-         }`}>
-          <span className="text-gray-600 font-semibold">Durée d'essai : </span>
+       {trialStatus && !trialStatus.isExpired && (
+         <div className="flex items-center gap-2 text-sm text-orange-600">
+           <span className="text-gray-600 font-semibold">Durée d'essai : </span>
            <BiSolidTimeFive />
-           {trialStatus.isExpired ? (
-             'Essai expiré'
-           ) : (
-             `${trialStatus.daysLeft} jour${trialStatus.daysLeft > 1 ? 's' : ''} restant${trialStatus.daysLeft > 1 ? 's' : ''}`
-           )}
+           {`${trialStatus.daysLeft} jour${trialStatus.daysLeft > 1 ? 's' : ''} restant${trialStatus.daysLeft > 1 ? 's' : ''}`}
          </div>
        )}
      </div>

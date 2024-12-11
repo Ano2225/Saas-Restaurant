@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { X, Save, Folder, Link, FolderTree } from 'lucide-react';
+import { X, Save, Folder, Link, FolderTree,ImagePlus } from 'lucide-react';
 
 interface Category {
   id: number;
@@ -9,6 +9,7 @@ interface Category {
   slug: string;
   parentId: number | null;
   children: Category[];
+  image: string;
   _count: {
     products: number;
   };
@@ -24,10 +25,14 @@ interface CategoryFormProps {
 
 export const CategoryForm: React.FC<CategoryFormProps> = ({ onClose, onSave, category }) => {
   const [categories, setCategories] = useState<Category[]>([]);
+  const [imagePreview, setImagePreview] = useState(category?.image || '');
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     name: category?.name || '',
     slug: category?.slug || '',
-    parentId: category?.parentId || ''
+    parentId: category?.parentId || '',
+    image: category?.image || ''
+
   });
 
   useEffect(() => {
@@ -112,7 +117,78 @@ export const CategoryForm: React.FC<CategoryFormProps> = ({ onClose, onSave, cat
                 />
               </div>
             </div>
+            {/* Upload d'image */}
+                <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Image de la catégorie</label>
+                <div className="flex items-center gap-4">
+                    {/* Prévisualisation */}
+                    <div className="w-24 h-24 border rounded-xl overflow-hidden bg-gray-50">
+                    {imagePreview ? (
+                        <img 
+                        src={imagePreview} 
+                        alt="Aperçu" 
+                        className="w-full h-full object-cover"
+                        />
+                    ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                        <Folder className="w-8 h-8 text-gray-400" />
+                        </div>
+                    )}
+                    </div>
 
+                    {/* Input file */}
+                    <div className="flex-1">
+                    <label className="cursor-pointer">
+                        <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                            setUploading(true);
+                            try {
+                                // Créer une URL temporaire pour la prévisualisation
+                                const previewUrl = URL.createObjectURL(file);
+                                setImagePreview(previewUrl);
+                                
+                                const formData = new FormData();
+                                formData.append('file', file);
+                                
+                                const response = await fetch('/api/upload', {
+                                method: 'POST',
+                                body: formData
+                                });
+                                const data = await response.json();
+                                
+                                if (response.ok) {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    image: data.url
+                                }));
+                                } else {
+                                throw new Error(data.error);
+                                }
+                            } catch (error) {
+                                console.error('Erreur upload:', error);
+                                alert('Erreur lors de l\'upload de l\'image');
+                                setImagePreview('');
+                            } finally {
+                                setUploading(false);
+                            }
+                            }
+                        }}
+                        />
+                        <div className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-xl hover:bg-gray-50">
+                        <ImagePlus className="w-5 h-5 text-gray-400" />
+                        <span className="text-sm text-gray-600">
+                            {uploading ? 'Chargement...' : 'Choisir une image'}
+                        </span>
+                        </div>
+                    </label>
+                    </div>
+                </div>
+                </div>
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">Slug</label>
               <div className="relative">

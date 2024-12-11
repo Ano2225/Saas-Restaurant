@@ -1,23 +1,26 @@
 import prisma from "@/app/lib/prisma"
 import { NextResponse } from "next/server";
 
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
-    try {
-      const data = await request.json();
-      const category = await prisma.category.update({
-        where: { id: parseInt(params.id) },
-        data: {
-          name: data.name,
-          slug: data.slug,
-          parentId: data.parentId || null
-        }
-      });
-      return NextResponse.json(category);
-    } catch (error) {
-      return NextResponse.json({ error: 'Erreur lors de la mise à jour de la catégorie' }, { status: 500 });
-    }
-  }
+interface Params {
+  id: string;
+}
 
+export async function PUT(request: Request, { params }: { params: Params }) {
+  try {
+    const data = await request.json();
+    const category = await prisma.category.update({
+      where: { id: parseInt(params.id) },
+      data: {
+        name: data.name,
+        slug: data.slug,
+        parentId: data.parentId || null
+      }
+    });
+    return NextResponse.json(category);
+  } catch (error) {
+    return NextResponse.json({ error: 'Erreur lors de la mise à jour de la catégorie' }, { status: 500 });
+  }
+}
     
   export async function DELETE(request: Request, { params }: { params: { id: string } }) {
     try {

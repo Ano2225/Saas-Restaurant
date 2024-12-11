@@ -18,56 +18,67 @@ export default function RegisterPage() {
    telephone: ''
  })
  const [loading, setLoading] = useState(false)
+ const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
- const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-   e.preventDefault()
-   setLoading(true)
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {}
+    if (!formData.name) newErrors.name = 'Le nom est requis.'
+    if (!formData.enterprise_name) newErrors.enterprise_name = 'Le nom de l\'entreprise est requis.'
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+      newErrors.email = 'Un email valide est requis.'
+    if (!formData.password || formData.password.length < 6)
+      newErrors.password = 'Le mot de passe doit contenir au moins 6 caractères.'
+    if (!formData.telephone || formData.telephone.length !== 10)
+      newErrors.telephone = 'Le numéro de téléphone doit contenir 10 chiffres.'
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
 
-   try {
-    const response = await fetch('/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData),
-    });
-    
-    if (response.ok) {
-      const data = await response.json();
-      toast.success('Compte créé avec succès !');
-      setTimeout(() => router.push('/login'), 2000);
-    } else {
-      const errorText = await response.text(); 
-      toast.error(errorText || 'Une erreur est survenue');
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!validateForm()) return
+
+    setLoading(true)
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+
+      if (response.ok) {
+        toast.success('Compte créé avec succès !')
+        setTimeout(() => router.push('/login'), 2000)
+      } else {
+        const { message } = await response.json()
+        toast.error(message || 'Une erreur est survenue.')
+      }
+    } catch (error) {
+      toast.error('Impossible de se connecter au serveur.')
+    } finally {
+      setLoading(false)
     }
-    
+  }
 
-     toast.success('Compte créé avec succès ! Redirection vers la page de connexion')
-     
-     setTimeout(() => {
-       router.push('/login')
-     }, 2000)
-   } catch (error) {
-     toast.error(error instanceof Error ? error.message : 'Une erreur est survenue')
-   } finally {
-     setLoading(false)
-   }
- }
-
- const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-   const { name, value } = e.target
-   if (name === 'telephone') {
-     const numericValue = value.replace(/\D/g, '').slice(0, 8)
-     setFormData(prev => ({
-       ...prev,
-       [name]: numericValue
-     }))
-     return
-   }
-
-   setFormData(prev => ({
-     ...prev,
-     [name]: value
-   }))
- }
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    if (name === 'telephone') {
+      const numericValue = value.replace(/\D/g, '').slice(0, 10)
+      setFormData(prev => ({
+        ...prev,
+        [name]: numericValue
+      }))
+      return
+    }
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+    setErrors(prev => ({
+      ...prev,
+      [name]: ''
+    }))
+  }
 
  return (
    <div className="min-h-screen flex bg-[#f8f9fd]">
@@ -139,6 +150,8 @@ export default function RegisterPage() {
                  className="appearance-none rounded-lg relative block w-full px-4 py-2.5 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#fbaf03] focus:border-transparent transition duration-150 ease-in-out"
                  placeholder="Arouna Ouattara"
                />
+               {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+
              </div>
 
              <div>
@@ -155,6 +168,8 @@ export default function RegisterPage() {
                  className="appearance-none rounded-lg relative block w-full px-4 py-2.5 border border-gray-300 placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#fbaf03] focus:border-transparent"
                  placeholder="Restaurant SARL"
                />
+                  {errors.enterprise_name && <p className="text-red-500 text-sm">{errors.enterprise_name}</p>}
+
              </div>
 
              <div>
@@ -182,7 +197,7 @@ export default function RegisterPage() {
                  id="telephone"
                  name="telephone"
                  type="tel"
-                 maxLength={8}
+                 maxLength={10}
                  required
                  value={formData.telephone}
                  onChange={handleChange}

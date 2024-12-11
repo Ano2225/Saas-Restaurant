@@ -9,7 +9,7 @@ const registerSchema = z.object({
   password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
   enterprise_name: z.string().min(2, "Nom minimum doit contenir au moins 3 caractères"),
   telephone: z.string()
- .length(8, "Le numéro doit contenir exactement 8 chiffres") 
+ .length(10, "Le numéro doit contenir exactement 10 chiffres") 
  .regex(/^\d+$/, "Le numéro ne doit contenir que des chiffres")
 })
 

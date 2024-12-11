@@ -59,7 +59,7 @@ export default function Header() {
  const menuItems: NavItem[] = [
    { href: '/people', label: 'Personnel', icon: <Users className="w-6 h-6" /> },
    { href: '/wallet', label: 'Portefeuille', icon: <Wallet className="w-6 h-6" /> },
-   { href: '/items', label: 'Articles', icon: <UtensilsCrossed className="w-6 h-6" /> },
+   { href: '/product_management', label: 'Articles', icon: <UtensilsCrossed className="w-6 h-6" /> },
    { href: '/reviews', label: 'Avis', icon: <Star className="w-6 h-6" /> },
    { href: '/settings', label: 'Paramètres', icon: <Settings className="w-6 h-6" /> },
    { href: '/support', label: 'Support', icon: <Mail className="w-6 h-6" /> },
